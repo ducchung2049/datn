@@ -58,3 +58,9 @@ git push origin feature-branch
     - Click "Create pull request".
 
 Done. Repeat for each feature, starting from step 4.
+
+# Run
+
+```sh
+$ docker-compose -f docker-compose.dev.yml up --build frontend
+```
