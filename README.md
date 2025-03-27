@@ -62,5 +62,5 @@ Done. Repeat for each feature, starting from step 4.
 # Run
 
 ```sh
-$ docker-compose -f docker-compose.dev.yml up --build frontend
+$ docker-compose -f docker-compose.dev.yml up frontend backend
 ```

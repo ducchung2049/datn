@@ -1,6 +1,6 @@
 # Traveloke
 
-## Folder Structure
+## Folder structure
 
 ```
 /src

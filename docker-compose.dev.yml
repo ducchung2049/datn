@@ -4,6 +4,7 @@ networks:
 
 volumes:
   frontend_node_modules:
+  backend_venv:
 
 services:
   # docker-compose -f docker-compose.dev.yml up --build frontend
@@ -39,17 +40,29 @@ services:
     networks:
       - datn-network
 
-#  # docker compose -f docker-compose.dev.yml run --rm --user $(id -u):$(id -g) frontend-init
-#  frontend-init:
-#    image: node:22-alpine
-#    volumes:
-#      - .:/app:rw,Z  # Mount project root instead
-#    working_dir: /app
-#    command: >
-#      sh -c "corepack enable &&
-#             corepack prepare pnpm@latest --activate &&
-#             exec /bin/sh -c 'pnpm create quasar'"
-#    stdin_open: true
-#    tty: true
-#    profiles:
-#      - init
+
+  # docker-compose -f docker-compose.dev.yml up --build backend
+  backend:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/backend.dev.dockerfile
+    container_name: datn-backend
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app:delegated
+      - backend_venv:/app/.venv
+    env_file:
+      - ./backend/.env
+    command: sh -c ".venv/bin/flask run --host 0.0.0.0"
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    networks:
+      - datn-network
