@@ -1,0 +1,16 @@
+.pnpm-store
+.quasar
+.vscode
+node_modules
+.editorconfig
+.editorconfig.example
+.gitignore
+.npmrc
+.npmrc.example
+eslint.config.js
+eslint.config.js.example
+jsconfig.json
+jsconfig.json.example
+postcss.config.js.example
+quasar.config.js.example
+README.md
