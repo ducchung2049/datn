@@ -1,68 +1,53 @@
 networks:
-  datn-network:
-    driver: bridge
+    datn-network:
+        driver: bridge
 
 volumes:
-  frontend_node_modules:
-  backend_venv:
+    frontend_node_modules:
+    backend_venv:
 
 services:
-  # docker-compose -f docker-compose.dev.yml up --build frontend
-  frontend:
-    build:
-      context: .
-      dockerfile: ./dockerfiles/frontend.dev.dockerfile
-    container_name: datn-frontend
-    working_dir: /app
-    ports:
-      - "8080:8080"  # Main app port
-      - "9000:9000"  # WebSocket port for HMR
-    volumes:
-      - ./frontend:/app:cached  # Bind mount with performance optimization
-      - frontend_node_modules:/app/node_modules  # Named volume for node_modules
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true  # Better file watching for Docker
-      - HOST=0.0.0.0  # Allow connections from outside the container
-      - QUASAR_DEV_SERVER_PUBLIC=0.0.0.0  # Required for HMR
-    command: sh -c "pnpm install && quasar dev"
-    # Enable better terminal support
-    tty: true
-    stdin_open: true
-    # Restart policy for development
-    restart: unless-stopped
-    # Resource constraints
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-    networks:
-      - datn-network
+    # docker-compose -f docker-compose.dev.yml up --build frontend
+    frontend:
+        build:
+            context: .
+            dockerfile: ./dockerfiles/frontend.dev.dockerfile
+        container_name: datn-frontend
+        ports:
+            - "5173:5173"
+        volumes:
+            - ./frontend:/app:delegated
+            - frontend_node_modules:/app/node_modules
+        environment:
+            - NODE_ENV=development
+        command: sh -c "bun install && bun dev -- --host 0.0.0.0"
+        stdin_open: true
+        tty: true
+        networks:
+            - datn-network
 
-
-  # docker-compose -f docker-compose.dev.yml up --build backend
-  backend:
-    build:
-      context: .
-      dockerfile: ./dockerfiles/backend.dev.dockerfile
-    container_name: datn-backend
-    working_dir: /app
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./backend:/app:delegated
-      - backend_venv:/app/.venv
-    env_file:
-      - ./backend/.env
-    command: sh -c ".venv/bin/flask run --host 0.0.0.0"
-    tty: true
-    stdin_open: true
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-    networks:
-      - datn-network
+    # docker-compose -f docker-compose.dev.yml up --build backend
+    backend:
+        build:
+            context: .
+            dockerfile: ./dockerfiles/backend.dev.dockerfile
+        container_name: datn-backend
+        working_dir: /app
+        ports:
+            - "5000:5000"
+        volumes:
+            - ./backend:/app:delegated
+            - backend_venv:/app/.venv
+        env_file:
+            - ./backend/.env
+        command: sh -c ".venv/bin/flask run --host 0.0.0.0"
+        tty: true
+        stdin_open: true
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    cpus: "1"
+                    memory: 1G
+        networks:
+            - datn-network
